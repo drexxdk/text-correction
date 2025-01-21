@@ -80,8 +80,43 @@ const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
   const start = target.selectionStart || 0;
   const length = target.value.length;
 
-  if (e.code === "Space") {
-    // ignore spacebar unless within a word
+  if (e.key === "Delete") {
+    if (start === length && nextWord) {
+      const input = nextWord.querySelector("input");
+      input?.focus();
+      input?.setSelectionRange(0, 0);
+    }
+  } else if (e.key === "Backspace") {
+    if (start === 0 && prevWord) {
+      const input = prevWord.querySelector("input");
+      input?.focus();
+      input?.setSelectionRange(input.value.length, input.value.length);
+    }
+  } else if (e.key === "ArrowRight") {
+    if (start === length && nextWord) {
+      const input = nextWord.querySelector("input");
+      const nextWord2 = getNextSibling({
+        element: nextWord as HTMLElement,
+        selector: ".word",
+      });
+      const input2 = nextWord2?.querySelector("input");
+      debugger;
+      if (input?.value === "" && input2?.value !== "") {
+        input2?.focus();
+        input2?.setSelectionRange(0, 0);
+      } else {
+        input?.focus();
+        input?.setSelectionRange(0, 0);
+      }
+      e.preventDefault();
+    }
+  } else if (e.key === "ArrowLeft") {
+    if (start === 0 && prevWord) {
+      const input = prevWord.querySelector("input");
+      input?.focus();
+      input?.setSelectionRange(input.value.length, input.value.length);
+    }
+  } else {
     const prevChar =
       target.selectionStart !== null && target.selectionStart > 0
         ? target.value.charAt(target.selectionStart - 1)
@@ -91,34 +126,57 @@ const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       target.selectionStart < target.value.length
         ? target.value.charAt(target.selectionStart)
         : null;
-    if (
-      prevChar === " " ||
-      nextChar === " " ||
-      prevChar === null ||
-      nextChar === null
+
+    if (e.code === "Space") {
+      if (prevChar === " " || nextChar === " ") {
+        e.preventDefault();
+      } else {
+        if (
+          prevChar === null &&
+          element?.querySelector(".original span")?.innerHTML !== " "
+        ) {
+          if (prevWord?.querySelector(".original span")?.innerHTML === " ") {
+            const prevInput = prevWord?.querySelector("input");
+            if (prevInput?.value === "") {
+              prevInput?.focus();
+            } else {
+              e.preventDefault();
+            }
+          }
+        } else if (
+          nextChar === null &&
+          element?.querySelector(".original span")?.innerHTML !== " "
+        ) {
+          if (nextWord?.querySelector(".original span")?.innerHTML === " ") {
+            const nextInput = nextWord?.querySelector("input");
+            if (nextInput?.value === "") {
+              nextInput?.focus();
+            } else {
+              e.preventDefault();
+            }
+            //
+          }
+        }
+      }
+    } else if (
+      prevChar === " " &&
+      nextWord &&
+      target.selectionStart !== null &&
+      target.selectionStart - 1 === 0
     ) {
-      e.preventDefault();
+      const input = nextWord.querySelector("input");
+      input?.focus();
+      input?.setSelectionRange(0, 0);
+    } else if (
+      nextChar === " " &&
+      prevWord &&
+      target.selectionStart !== null &&
+      target.selectionStart + 1 === target.value.length
+    ) {
+      const input = prevWord.querySelector("input");
+      input?.focus();
+      input?.setSelectionRange(input.value.length, input.value.length);
     }
-  } else if (e.key === "Delete" && start === length && nextWord) {
-    // delete first character of next word
-    const input = nextWord.querySelector("input");
-    input?.focus();
-    input?.setSelectionRange(0, 0);
-  } else if (e.key === "Backspace" && start === 0 && prevWord) {
-    // delete last character of previous word
-    const input = prevWord.querySelector("input");
-    input?.focus();
-    input?.setSelectionRange(input.value.length, input.value.length);
-  } else if (e.key === "ArrowRight" && start === length && nextWord) {
-    // jump to second character of next word
-    const input = nextWord.querySelector("input");
-    input?.focus();
-    input?.setSelectionRange(1, 0);
-  } else if (e.key === "ArrowLeft" && start === 0 && prevWord) {
-    // jump to second to last character of previous word
-    const input = prevWord.querySelector("input");
-    input?.focus();
-    input?.setSelectionRange(input.value.length, input.value.length);
   }
 };
 
@@ -127,20 +185,36 @@ const Word = ({ word }: { word: string }) => {
   const [value, setValue] = useState<string>(word);
 
   useEffect(() => {
-    if (value === "" && word === " ") {
+    if (word === " ") {
       const prevWord = getPreviousSibling({
         element: ref.current,
         selector: ".word",
       })?.querySelector(".original");
-      if (prevWord) {
-        (prevWord as HTMLElement).style.visibility = "visible";
-      }
       const nextWord = getNextSibling({
         element: ref.current,
         selector: ".word",
       })?.querySelector(".original");
-      if (nextWord) {
-        (nextWord as HTMLElement).style.visibility = "visible";
+      const input = ref.current?.querySelector("input");
+      if (value === "") {
+        if (input) {
+          input.style.backgroundColor = "red";
+        }
+        if (prevWord) {
+          (prevWord as HTMLElement).style.visibility = "visible";
+        }
+        if (nextWord) {
+          (nextWord as HTMLElement).style.visibility = "visible";
+        }
+      } else {
+        if (input) {
+          input.style.backgroundColor = "";
+        }
+        if (prevWord) {
+          (prevWord as HTMLElement).style.visibility = "";
+        }
+        if (nextWord) {
+          (nextWord as HTMLElement).style.visibility = "";
+        }
       }
     }
   }, [value, word]);
