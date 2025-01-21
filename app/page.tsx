@@ -100,7 +100,6 @@ const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         selector: ".word",
       });
       const input2 = nextWord2?.querySelector("input");
-      debugger;
       if (input?.value === "" && input2?.value !== "") {
         input2?.focus();
         input2?.setSelectionRange(0, 0);
