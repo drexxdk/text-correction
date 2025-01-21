@@ -88,7 +88,26 @@ const Word = ({ word }: { word: string }) => {
     const start = target.selectionStart || 0;
     const length = target.value.length;
 
-    if (e.key === "Delete" && start === length && nextWord) {
+    if (e.code === "Space") {
+      // ignore spacebar unless within a word
+      const prevChar =
+        target.selectionStart !== null && target.selectionStart > 0
+          ? target.value.charAt(target.selectionStart - 1)
+          : null;
+      const nextChar =
+        target.selectionStart !== null &&
+        target.selectionStart < target.value.length
+          ? target.value.charAt(target.selectionStart)
+          : null;
+      if (
+        prevChar === " " ||
+        nextChar === " " ||
+        prevChar === null ||
+        nextChar === null
+      ) {
+        e.preventDefault();
+      }
+    } else if (e.key === "Delete" && start === length && nextWord) {
       // delete first character of next word
       const input = nextWord.querySelector("input");
       input?.focus();
@@ -131,7 +150,7 @@ const Word = ({ word }: { word: string }) => {
       </span>
       <input
         type="text"
-        className="absolute bg-green-500 bottom-0 left-0 right-0 border-none focus:outline-none bg-transparent text-inherit h-6 focus:bg-red-500"
+        className="absolute bg-green-500 bottom-0 left-0 right-0 border-none focus:outline-none text-inherit h-6 focus:bg-red-500"
         onChange={onChange}
         onKeyDown={onKeyDown}
         value={value}
