@@ -1,101 +1,142 @@
-import Image from "next/image";
+"use client";
+
+import { useRef, useState } from "react";
+import classNames from "classnames";
+
+const getNextSibling = ({
+  element,
+  selector,
+}: {
+  element: HTMLElement | null;
+  selector: string;
+}) => {
+  if (!element) {
+    return null;
+  }
+  // Get the next sibling element
+  let sibling = element.nextElementSibling;
+  if (!selector) return sibling;
+
+  // If the sibling matches our selector, use it
+  // If not, jump to the next sibling and continue the loop
+  while (sibling) {
+    if (sibling.matches(selector)) return sibling;
+    sibling = sibling.nextElementSibling;
+  }
+  return sibling;
+};
+
+const getPreviousSibling = ({
+  element,
+  selector,
+}: {
+  element: HTMLElement | null;
+  selector: string;
+}) => {
+  if (!element) {
+    return null;
+  }
+  // Get the next sibling element
+  let sibling = element.previousElementSibling;
+
+  // If there's no selector, return the first sibling
+  if (!selector) return sibling;
+
+  // If the sibling matches our selector, use it
+  // If not, jump to the next sibling and continue the loop
+  while (sibling) {
+    if (sibling.matches(selector)) return sibling;
+    sibling = sibling.previousElementSibling;
+  }
+  return sibling;
+};
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+    <p>
+      <Word word="How" />
+      <Word word=" " />
+      <Word word="is" />
+      <Word word=" " />
+      <Word word="it" />
+      <Word word=" " />
+      <Word word="go ing" />
+      <br />
+      <Word word="This" />
+      <Word word=" " />
+      <Word word="is" />
+      <Word word=" " />
+      <Word word="Fun" />
+    </p>
   );
 }
+
+const Word = ({ word }: { word: string }) => {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [value, setValue] = useState<string>(word);
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const target = e.target as HTMLInputElement;
+    const element = target.closest(".word") as HTMLElement | null;
+    const prevWord = getPreviousSibling({ element, selector: ".word" });
+    const nextWord = getNextSibling({ element, selector: ".word" });
+
+    const start = target.selectionStart || 0;
+    const length = target.value.length;
+
+    if (e.key === "Delete" && start === length && nextWord) {
+      // delete first character of next word
+      const input = nextWord.querySelector("input");
+      input?.focus();
+      input?.setSelectionRange(0, 0);
+    } else if (e.key === "Backspace" && start === 0 && prevWord) {
+      // delete last character of previous word
+      const input = prevWord.querySelector("input");
+      input?.focus();
+    } else if (e.key === "ArrowRight" && start === length && nextWord) {
+      // jump to second character of next word
+      const input = nextWord.querySelector("input");
+      input?.focus();
+      input?.setSelectionRange(1, 0);
+    } else if (e.key === "ArrowLeft" && start === 0 && prevWord) {
+      // jump to second to last character of previous word
+      const input = prevWord.querySelector("input");
+      input?.focus();
+      input?.setSelectionRange(input.value.length, input.value.length);
+    }
+  };
+
+  return (
+    <span
+      className="word relative inline-flex flex-col text-black h-12"
+      ref={ref}
+    >
+      <span
+        className={classNames(
+          "pointer-events-none absolute top-0 bg-orange-500 h-6 whitespace-pre",
+          { invisible: value === word }
+        )}
+      >
+        {word}
+      </span>
+      <span className="invisible pointer-events-none whitespace-pre">
+        {word}
+      </span>
+      <span className="invisible pointer-events-none whitespace-pre">
+        {value}
+      </span>
+      <input
+        type="text"
+        className="absolute bg-green-500 bottom-0 left-0 right-0 border-none focus:outline-none bg-transparent text-inherit h-6 focus:bg-red-500"
+        onChange={onChange}
+        onKeyDown={onKeyDown}
+        value={value}
+        spellCheck={false}
+      />
+    </span>
+  );
+};
