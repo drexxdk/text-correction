@@ -20,7 +20,11 @@ const getNextSibling = ({
   // If the sibling matches our selector, use it
   // If not, jump to the next sibling and continue the loop
   while (sibling) {
-    if (sibling.matches(selector)) return sibling;
+    if (
+      sibling.matches(selector) &&
+      sibling.querySelector("input")?.value !== ""
+    )
+      return sibling;
     sibling = sibling.nextElementSibling;
   }
   return sibling;
@@ -45,7 +49,11 @@ const getPreviousSibling = ({
   // If the sibling matches our selector, use it
   // If not, jump to the next sibling and continue the loop
   while (sibling) {
-    if (sibling.matches(selector)) return sibling;
+    if (
+      sibling.matches(selector) &&
+      sibling.querySelector("input")?.value !== ""
+    )
+      return sibling;
     sibling = sibling.previousElementSibling;
   }
   return sibling;
@@ -95,25 +103,15 @@ const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
   } else if (e.key === "ArrowRight") {
     if (start === length && nextWord) {
       const input = nextWord.querySelector("input");
-      const nextWord2 = getNextSibling({
-        element: nextWord as HTMLElement,
-        selector: ".word",
-      });
-      const input2 = nextWord2?.querySelector("input");
-      if (input?.value === "" && input2?.value !== "") {
-        input2?.focus();
-        input2?.setSelectionRange(0, 0);
-      } else {
-        input?.focus();
-        input?.setSelectionRange(0, 0);
-      }
+      input?.focus();
+      input?.setSelectionRange(1, 1);
       e.preventDefault();
     }
   } else if (e.key === "ArrowLeft") {
     if (start === 0 && prevWord) {
       const input = prevWord.querySelector("input");
       input?.focus();
-      input?.setSelectionRange(input.value.length, input.value.length);
+      input?.setSelectionRange(input.value.length - 1, input.value.length - 1);
     }
   } else {
     const prevChar =
@@ -127,7 +125,12 @@ const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         : null;
 
     if (e.code === "Space") {
-      if (prevChar === " " || nextChar === " ") {
+      if (
+        prevChar === " " ||
+        nextChar === " " ||
+        (prevWord === null && target.selectionStart === 0) ||
+        (nextWord === null && target.selectionStart === target.value.length)
+      ) {
         e.preventDefault();
       } else {
         if (
