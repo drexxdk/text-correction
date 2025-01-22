@@ -4,17 +4,8 @@ import { getPreviousSibling } from "./getPreviousSibling";
 export const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
   const target = e.target as HTMLInputElement;
   const element = target.closest(".word") as HTMLElement | null;
-
-  const prevWordIncludeEmpty = getPreviousSibling({
-    element,
-    selector: ".word",
-    includeEmpty: true,
-  });
-  const nextWordIncludeEmpty = getNextSibling({
-    element,
-    selector: ".word",
-    includeEmpty: true,
-  });
+  const selectionStart = target.selectionStart || 0;
+  const length = target.value.length;
 
   const prevWordExcludeEmpty = getPreviousSibling({
     element,
@@ -27,30 +18,27 @@ export const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     includeEmpty: false,
   });
 
-  const start = target.selectionStart || 0;
-  const length = target.value.length;
-
   if (e.key === "Delete") {
-    if (start === length && nextWordExcludeEmpty) {
+    if (selectionStart === length && nextWordExcludeEmpty) {
       const input = nextWordExcludeEmpty.querySelector("input");
       input?.focus();
       input?.setSelectionRange(0, 0);
     }
   } else if (e.key === "Backspace") {
-    if (start === 0 && prevWordExcludeEmpty) {
+    if (selectionStart === 0 && prevWordExcludeEmpty) {
       const input = prevWordExcludeEmpty.querySelector("input");
       input?.focus();
       input?.setSelectionRange(input.value.length, input.value.length);
     }
   } else if (e.key === "ArrowRight") {
-    if (start === length && nextWordExcludeEmpty) {
+    if (selectionStart === length && nextWordExcludeEmpty) {
       const input = nextWordExcludeEmpty.querySelector("input");
       input?.focus();
       input?.setSelectionRange(1, 1);
       e.preventDefault();
     }
   } else if (e.key === "ArrowLeft") {
-    if (start === 0 && prevWordExcludeEmpty) {
+    if (selectionStart === 0 && prevWordExcludeEmpty) {
       const input = prevWordExcludeEmpty.querySelector("input");
       input?.focus();
       input?.setSelectionRange(input.value.length - 1, input.value.length - 1);
@@ -67,6 +55,17 @@ export const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         : null;
 
     if (e.code === "Space") {
+      const prevWordIncludeEmpty = getPreviousSibling({
+        element,
+        selector: ".word",
+        includeEmpty: true,
+      });
+      const nextWordIncludeEmpty = getNextSibling({
+        element,
+        selector: ".word",
+        includeEmpty: true,
+      });
+
       if (
         prevChar === " " ||
         nextChar === " " ||

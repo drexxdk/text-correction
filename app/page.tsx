@@ -52,7 +52,7 @@ const Word = ({ word, id }: { word: string; id: string }) => {
       const input = ref.current?.querySelector("input");
       if (value === "") {
         if (input) {
-          input.style.backgroundColor = "red";
+          input.classList.add("bg-red-300");
         }
         if (prevWord) {
           (prevWord as HTMLElement).style.visibility = "visible";
@@ -82,7 +82,7 @@ const Word = ({ word, id }: { word: string; id: string }) => {
     >
       <span
         className={classNames(
-          "left-0 right-0 original pointer-events-none absolute bottom-6 bg-orange-500 h-6 whitespace-pre",
+          "left-0 right-0 original pointer-events-none absolute bottom-6 bg-orange-300 h-6 whitespace-pre",
           { invisible: value === word }
         )}
       >
@@ -96,7 +96,10 @@ const Word = ({ word, id }: { word: string; id: string }) => {
       </span>
       <input
         type="text"
-        className="focus:bg-gray-300 absolute bottom-0 left-0 right-0 border-none focus:outline-none text-inherit h-6"
+        className={classNames(
+          "absolute bottom-0 left-0 right-0 border-none focus:outline-none text-inherit h-6",
+          { "focus:bg-gray-200": value.length }
+        )}
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={onKeyDown}
         value={value}
