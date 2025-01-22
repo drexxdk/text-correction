@@ -3,6 +3,107 @@
 import { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 
+export default function Home() {
+  return (
+    <p className="p-5 bg-white text-black">
+      <Word word="How" id="1" />
+      <Word word=" " id="2" />
+      <Word word="is" id="3" />
+      <Word word=" " id="4" />
+      <Word word="it" id="5" />
+      <Word word=" " id="6" />
+      <Word word="go ing" id="7" />
+      <br />
+      <Word word="This" id="8" />
+      <Word word=" " id="9" />
+      <Word word="is" id="10" />
+      <Word word=" " id="11" />
+      <Word word="Fun" id="12" />
+    </p>
+  );
+}
+
+const Word = ({ word, id }: { word: string; id: string }) => {
+  const split = word.split(/(\s)/g).filter((item) => item.length);
+  return split.map((elem, i) => {
+    return <SplitWord key={i} word={elem} id={id} />;
+  });
+};
+
+const SplitWord = ({ word, id }: { word: string; id: string }) => {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [value, setValue] = useState<string>(word);
+
+  useEffect(() => {
+    if (word === " ") {
+      const prevWord = getPreviousSibling({
+        element: ref.current,
+        selector: ".word",
+        includeEmpty: false,
+      })?.querySelector(".original");
+      const nextWord = getNextSibling({
+        element: ref.current,
+        selector: ".word",
+        includeEmpty: false,
+      })?.querySelector(".original");
+      const input = ref.current?.querySelector("input");
+      if (value === "") {
+        if (input) {
+          input.style.backgroundColor = "red";
+        }
+        if (prevWord) {
+          (prevWord as HTMLElement).style.visibility = "visible";
+        }
+        if (nextWord) {
+          (nextWord as HTMLElement).style.visibility = "visible";
+        }
+      } else {
+        if (input) {
+          input.style.backgroundColor = "";
+        }
+        if (prevWord) {
+          (prevWord as HTMLElement).style.visibility = "";
+        }
+        if (nextWord) {
+          (nextWord as HTMLElement).style.visibility = "";
+        }
+      }
+    }
+  }, [value, word]);
+
+  return (
+    <span
+      className="word relative inline-flex items-end flex-col h-16"
+      data-id={id}
+      ref={ref}
+    >
+      <span
+        className={classNames(
+          /** inline-flex justify-center */
+          "left-0 right-0 original pointer-events-none absolute bottom-6 bg-orange-500 h-6 whitespace-pre",
+          { invisible: value === word }
+        )}
+      >
+        <span>{word}</span>
+      </span>
+      <span className="invisible pointer-events-none whitespace-pre h-0">
+        {word}
+      </span>
+      <span className="invisible pointer-events-none whitespace-pre h-0">
+        {value}
+      </span>
+      <input
+        type="text"
+        className="focus:bg-gray-300 absolute bottom-0 left-0 right-0 border-none focus:outline-none text-inherit h-6"
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={onKeyDown}
+        value={value}
+        spellCheck={false}
+      />
+    </span>
+  );
+};
+
 const getNextSibling = ({
   element,
   selector,
@@ -66,26 +167,6 @@ const getPreviousSibling = ({
   }
   return sibling;
 };
-
-export default function Home() {
-  return (
-    <p className="p-5 bg-white text-black">
-      <Word word="How" id="1" />
-      <Word word=" " id="2" />
-      <Word word="is" id="3" />
-      <Word word=" " id="4" />
-      <Word word="it" id="5" />
-      <Word word=" " id="6" />
-      <Word word="go ing" id="7" />
-      <br />
-      <Word word="This" id="8" />
-      <Word word=" " id="9" />
-      <Word word="is" id="10" />
-      <Word word=" " id="11" />
-      <Word word="Fun" id="12" />
-    </p>
-  );
-}
 
 const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
   const target = e.target as HTMLInputElement;
@@ -214,85 +295,4 @@ const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       input?.setSelectionRange(input.value.length, input.value.length);
     }
   }
-};
-
-const Word = ({ word, id }: { word: string; id: string }) => {
-  const split = word.split(/(\s)/g).filter((item) => item.length);
-  return split.map((elem, i) => {
-    return <SplitWord key={i} word={elem} id={id} />;
-  });
-};
-
-const SplitWord = ({ word, id }: { word: string; id: string }) => {
-  const ref = useRef<HTMLSpanElement>(null);
-  const [value, setValue] = useState<string>(word);
-
-  useEffect(() => {
-    if (word === " ") {
-      const prevWord = getPreviousSibling({
-        element: ref.current,
-        selector: ".word",
-        includeEmpty: false,
-      })?.querySelector(".original");
-      const nextWord = getNextSibling({
-        element: ref.current,
-        selector: ".word",
-        includeEmpty: false,
-      })?.querySelector(".original");
-      const input = ref.current?.querySelector("input");
-      if (value === "") {
-        if (input) {
-          input.style.backgroundColor = "red";
-        }
-        if (prevWord) {
-          (prevWord as HTMLElement).style.visibility = "visible";
-        }
-        if (nextWord) {
-          (nextWord as HTMLElement).style.visibility = "visible";
-        }
-      } else {
-        if (input) {
-          input.style.backgroundColor = "";
-        }
-        if (prevWord) {
-          (prevWord as HTMLElement).style.visibility = "";
-        }
-        if (nextWord) {
-          (nextWord as HTMLElement).style.visibility = "";
-        }
-      }
-    }
-  }, [value, word]);
-
-  return (
-    <span
-      className="word relative inline-flex items-end flex-col h-16"
-      data-id={id}
-      ref={ref}
-    >
-      <span
-        className={classNames(
-          /** inline-flex justify-center */
-          "left-0 right-0 original pointer-events-none absolute bottom-6 bg-orange-500 h-6 whitespace-pre",
-          { invisible: value === word }
-        )}
-      >
-        <span>{word}</span>
-      </span>
-      <span className="invisible pointer-events-none whitespace-pre h-0">
-        {word}
-      </span>
-      <span className="invisible pointer-events-none whitespace-pre h-0">
-        {value}
-      </span>
-      <input
-        type="text"
-        className="focus:bg-gray-300 absolute bottom-0 left-0 right-0 border-none focus:outline-none text-inherit h-6"
-        onChange={(e) => setValue(e.target.value)}
-        onKeyDown={onKeyDown}
-        value={value}
-        spellCheck={false}
-      />
-    </span>
-  );
 };
